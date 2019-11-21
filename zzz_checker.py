@@ -12,10 +12,12 @@ sys.path.insert(0, 'lib/')
 import logger, banner
 from mysmb import MYSMB
 
-parser = argparse.ArgumentParser(description="Test")
+parser = argparse.ArgumentParser(description="MS17-010 Checker")
 parser.add_argument("-t","--targets", metavar="",required=True, help="URL Encode")
 parser.add_argument("-c","--credentials", metavar="", help="URL Encode")
 args = parser.parse_args()
+
+vulnerable = {}
 
 if args.credentials:
 	USERNAME=args.credentials[0]
@@ -50,15 +52,15 @@ def get_targets(targets):
             for i in (contents):
                 target = i.rstrip()
                 target_list.append(target)
-            logger.verbose('Amount of targets from input: {}'.format(logger.BLUE(str(len(target_list)))))
             return target_list
     except:
         try:
             if "/" in targets:
                 try:
                     subnet = IPNetwork(targets)
-                except:
-                    logger.red('failed to parse')
+                except Exception as e:
+                    logger.red('failed to parse:')
+                    logger.red(str(e))
                     quit()
 
                 for i in subnet:
@@ -68,39 +70,39 @@ def get_targets(targets):
                         pass
                     else:
                         target_list.append(str(i))
-                logger.verbose('Amount of targets from input: {}'.format(logger.BLUE(str(len(target_list)))))
                 return target_list
             elif "," in targets:
                 ips=targets.split(',')
                 for ip in ips:
                     target_list.append(ip)
-                logger.verbose('Amount of targets from input: {}'.format(logger.BLUE(str(len(target_list)))))
                 return target_list
 
             else:
                 target_list.append(targets)
-                logger.verbose('Amount of targets from input: {}'.format(logger.BLUE(str(len(target_list)))))
                 return target_list
-        except:
-            logger.red('Failed to parse targets.')
+        except Exception as e:
+            logger.red('Failed to parse targets:')
+            logger.red(str(e))
             quit()
-
 
 def worawit(target):
 	try:
-		logger.blue('Connecting to: [{}]'.format(logger.BLUE(target)))
 		try:
 			conn = MYSMB(target, timeout=5)
 		except:
-			logger.red('Failed to connect to [{}]'.format(logger.RED(target)))
+			logger.red('Unable to connect to [{}]'.format(logger.RED(target)))
 			return False
 		try:
 			conn.login(USERNAME, PASSWORD)
 		except:
-			logger.red('Authentication failed: [{}]'.format(logger.RED(nt_errors.ERROR_MESSAGES[e.error_code][0])))
-			quit()
+			logger.red('Authentication failure: [{}]'.format(logger.RED(nt_errors.ERROR_MESSAGES[e.error_code][0])))
+			return False
 		finally:
-			logger.blue('Got OS: [{}]'.format(logger.BLUE(conn.get_server_os())))
+			try:
+				OS = conn.get_server_os()
+			except Exception as e:
+				logger.red(str(e))
+				return False
 
 		tid = conn.tree_connect_andx('\\\\' + target + '\\' + 'IPC$')
 		conn.set_default_tid(tid)
@@ -110,34 +112,45 @@ def worawit(target):
 		recvPkt = conn.send_trans(pack('<H', TRANS_PEEK_NMPIPE), maxParameterCount=0xffff, maxDataCount=0x800)
 		status = recvPkt.getNTStatus()
 		if status == 0xC0000205:  # STATUS_INSUFF_SERVER_RESOURCES
-			logger.green('[{}] IS NOT PATCHED!'.format(logger.GREEN(target)))
+			logger.green('[%s] VULNERABLE' % logger.GREEN(target))
+			vulnerable[target]=[]
 		else:
-			logger.red('[{}] IS PATCHED!'.format(logger.RED(target)))
-			quit()
+			logger.red('[%s] PATCHED' % logger.RED(target))
 
-		logger.blue('Checking named pipes...')
+		pipes_found = []
+
 		for pipe_name, pipe_uuid in pipes.items():
 			try:
 				dce = conn.get_dce_rpc(pipe_name)
 				dce.connect()
 				try:
 					dce.bind(pipe_uuid, transfer_syntax=NDR64Syntax)
-					logger.green('\t-\t{}: OK (64 bit)'.format(logger.GREEN(pipe_name)))
+					try:
+						pipes_found.append(pipe_name)
+					except:
+						pass
 				except DCERPCException as e:
 					if 'transfer_syntaxes_not_supported' in str(e):
-						logger.green('\t-\t{}: OK (32 bit)'.format(logger.GREEN(pipe_name)))
+						try:
+							pipes_found.append(pipe_name)
+						except:
+							pass
 					else:
-						logger.green('\t-\t{}: OK ({})'.format(logger.GREEN(pipe_name), str(e)))
+						try:
+							pipes_found.append(pipe_name)
+						except:
+							pass
 				dce.disconnect()
+				vulnerable[target]=pipes_found
 			except smb.SessionError as e:
-				logger.red('{}: {}'.format(logger.RED(pipe_name), logger.RED(nt_errors.ERROR_MESSAGES[e.error_code][0])))
+				continue
 			except smbconnection.SessionError as e:
-				logger.red('{}: {}'.format(logger.RED(pipe_name), logger.RED(nt_errors.ERROR_MESSAGES[e.error][0])))
+				continue
 
 		conn.disconnect_tree(tid)
 		conn.logoff()
 		conn.get_socket().close()
-	except (KeyboardInterrupt, SystemExit):
+	except KeyboardInterrupt:
 		logger.red('Keyboard interrupt received..')
 		quit()
 
@@ -146,10 +159,9 @@ def do_scan(targets):
 		worawit(target)
 
 banner.checker()
-
-logger.header()
 t=args.targets
 targets=get_targets(t)
 
 do_scan(targets)
 
+logger.dump(vulnerable)
