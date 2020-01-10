@@ -13,8 +13,8 @@ import logger, banner
 from mysmb import MYSMB
 
 parser = argparse.ArgumentParser(description="MS17-010 Checker")
-parser.add_argument("-t","--targets", metavar="",required=True, help="URL Encode")
-parser.add_argument("-c","--credentials", metavar="", help="URL Encode")
+parser.add_argument("-t","--targets", metavar="",required=True, help="Target(s) to attack")
+parser.add_argument("-c","--credentials", metavar="", help="Credentials to use")
 args = parser.parse_args()
 
 vulnerable = {}
