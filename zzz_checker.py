@@ -95,7 +95,7 @@ def worawit(target):
 		try:
 			conn.login(USERNAME, PASSWORD)
 		except:
-			logger.red('Authentication failure: [{}]'.format(logger.RED(nt_errors.ERROR_MESSAGES[e.error_code][0])))
+			logger.red('Failed to authenticate to [{}]'.format(logger.RED(target)))
 			return False
 		finally:
 			try:
