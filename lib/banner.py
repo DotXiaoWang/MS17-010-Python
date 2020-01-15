@@ -1,31 +1,14 @@
-# coding: utf-8
-	
-import logger
+#!/usr/bin/python
+# -*- coding: utf-8 -*- 
+import logger,sys
+sys.path.insert(0, 'lib/')
 
-def checker():
-	print ''
-	print(logger.RED(' █     █░ ▒█████   ██▀███   ▄▄▄       █     █░ ██▓▄▄▄█████▓')+logger.YELLOW(' ...zzz_checker'))
-	print(logger.RED('▓█░ █ ░█░▒██▒  ██▒▓██ ▒ ██▒▒████▄    ▓█░ █ ░█░▓██▒▓  ██▒ ▓▒'))
-	print(logger.RED('▒█░ █ ░█ ▒██░  ██▒▓██ ░▄█ ▒▒██  ▀█▄  ▒█░ █ ░█ ▒██▒▒ ▓██░ ▒░'))
-	print(logger.RED('░█░ █ ░█ ▒██   ██░▒██▀▀█▄  ░██▄▄▄▄██ ░█░ █ ░█ ░██░░ ▓██▓ ░ '))
-	print(logger.RED('░░██▒██▓ ░ ████▓▒░░██▓ ▒██▒ ▓█   ▓██▒░░██▒██▓ ░██░  ▒██▒ ░ '))
-	print(logger.RED('░ ▓░▒ ▒  ░ ▒░▒░▒░ ░ ▒▓ ░▒▓░ ▒▒   ▓▒█░░ ▓░▒ ▒  ░▓    ▒ ░░   '))
-	print(logger.RED('  ▒ ░ ░    ░ ▒ ▒░   ░▒ ░ ▒░  ▒   ▒▒ ░  ▒ ░ ░   ▒ ░    ░    '))
-	print(logger.RED('  ░   ░  ░ ░ ░ ▒    ░░   ░   ░   ▒     ░   ░   ▒ ░  ░      '))
-	print(logger.RED('    ░        ░ ░     ░           ░  ░    ░     ░           '))
-	print(logger.RED('                                                           '))
-	print ''
-
-def exploit():
-	print ''
-	print(logger.RED(' █     █░ ▒█████   ██▀███   ▄▄▄       █     █░ ██▓▄▄▄█████▓')+logger.YELLOW(' ...zzz_exploit'))
-	print(logger.RED('▓█░ █ ░█░▒██▒  ██▒▓██ ▒ ██▒▒████▄    ▓█░ █ ░█░▓██▒▓  ██▒ ▓▒'))
-	print(logger.RED('▒█░ █ ░█ ▒██░  ██▒▓██ ░▄█ ▒▒██  ▀█▄  ▒█░ █ ░█ ▒██▒▒ ▓██░ ▒░'))
-	print(logger.RED('░█░ █ ░█ ▒██   ██░▒██▀▀█▄  ░██▄▄▄▄██ ░█░ █ ░█ ░██░░ ▓██▓ ░ '))
-	print(logger.RED('░░██▒██▓ ░ ████▓▒░░██▓ ▒██▒ ▓█   ▓██▒░░██▒██▓ ░██░  ▒██▒ ░ '))
-	print(logger.RED('░ ▓░▒ ▒  ░ ▒░▒░▒░ ░ ▒▓ ░▒▓░ ▒▒   ▓▒█░░ ▓░▒ ▒  ░▓    ▒ ░░   '))
-	print(logger.RED('  ▒ ░ ░    ░ ▒ ▒░   ░▒ ░ ▒░  ▒   ▒▒ ░  ▒ ░ ░   ▒ ░    ░    '))
-	print(logger.RED('  ░   ░  ░ ░ ░ ▒    ░░   ░   ░   ▒     ░   ░   ▒ ░  ░      '))
-	print(logger.RED('    ░        ░ ░     ░           ░  ░    ░     ░           '))
-	print(logger.RED('                                                           '))
-	print ''
+def show(mode):
+	print(logger.RED(''))
+	print(logger.RED('███╗   ███╗███████╗ ██╗███████╗       ██████╗  ██╗ ██████╗ ...zzz_%s' % logger.RED(mode)))
+	print(logger.RED('████╗ ████║██╔════╝███║╚════██║      ██╔═████╗███║██╔═████╗'))
+	print(logger.RED('██╔████╔██║███████╗╚██║    ██╔╝█████╗██║██╔██║╚██║██║██╔██║'))
+	print(logger.RED('██║╚██╔╝██║╚════██║ ██║   ██╔╝ ╚════╝████╔╝██║ ██║████╔╝██║'))
+	print(logger.RED('██║ ╚═╝ ██║███████║ ██║   ██║        ╚██████╔╝ ██║╚██████╔╝'))
+	print(logger.RED('╚═╝     ╚═╝╚══════╝ ╚═╝   ╚═╝         ╚═════╝  ╚═╝ ╚═════╝ '))
+	print(logger.RED(''))

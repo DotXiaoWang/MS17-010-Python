@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- encoding: utf-8 -*- 
 
 from impacket import smb, smbconnection, nt_errors
 from impacket.uuid import uuidtup_to_bin
@@ -158,7 +159,7 @@ def do_scan(targets):
 	for target in targets:
 		worawit(target)
 
-banner.checker()
+banner.show('checker')
 t=args.targets
 targets=get_targets(t)
 
