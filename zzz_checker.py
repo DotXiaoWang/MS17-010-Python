@@ -114,6 +114,7 @@ def run(target):
 			logger.verbose('Successfully connected to %s' % logger.BLUE(target))
 		except Exception as e:
 			logger.red('Failed to connect to [{}]'.format(logger.RED(target)))
+			logger.verbose('Got error whilst connecting: %s' % logger.BLUE(str(e)))
 			return False
 		try:
 			# login(self, user, password, domain='', lmhash='', nthash='', ntlm_fallback=True, maxBufferSize=None)
