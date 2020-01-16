@@ -11,7 +11,6 @@ colour_magenta = "\033[1;35m"
 colour_remove= "\033[0m"
 cur_dir=os.path.dirname(os.path.abspath(__file__))
 verbose_switch = False
-debug_switch = False
 
 def RED(string):
 	string=str(string)
@@ -47,7 +46,8 @@ def yellow(string):
 
 def verbose(string):
 	log_time=strftime("%d/%m/%y, %H:%M:%S", gmtime())
-	print('['+log_time+']'+BLUE(' >> ' )+string)
+	if verbose_switch:
+		print('['+log_time+']'+BLUE(' >> ' )+string)
 
 def dump(vulnerable):
 	for target,pipes in vulnerable.items():
