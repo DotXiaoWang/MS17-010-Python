@@ -45,6 +45,10 @@ def yellow(string):
 	log_time=strftime("%d/%m/%y, %H:%M:%S", gmtime())
 	print('['+log_time+']'+YELLOW(' >> ' )+string)
 
+def verbose(string):
+	log_time=strftime("%d/%m/%y, %H:%M:%S", gmtime())
+	print('['+log_time+']'+BLUE(' >> ' )+string)
+
 def dump(vulnerable):
 	for target,pipes in vulnerable.items():
 		if len(pipes) == 0:
