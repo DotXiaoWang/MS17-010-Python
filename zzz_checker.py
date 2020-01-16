@@ -86,7 +86,7 @@ def get_targets(targets):
             logger.red(str(e))
             quit()
 
-def worawit(target):
+def run(target):
 	try:
 		try:
 			conn = MYSMB(target, timeout=5)
@@ -98,25 +98,29 @@ def worawit(target):
 		except:
 			logger.red('Failed to authenticate to [{}]'.format(logger.RED(target)))
 			return False
-		finally:
-			try:
-				OS = conn.get_server_os()
-			except Exception as e:
-				logger.red(str(e))
-				return False
+		try:
+			OS = conn.get_server_os()
+		except Exception as e:
+			logger.red('Failed to obtain operating system')
 
-		tid = conn.tree_connect_andx('\\\\' + target + '\\' + 'IPC$')
-		conn.set_default_tid(tid)
+		try:
+			tid = conn.tree_connect_andx('\\\\' + target + '\\' + 'IPC$')
+			conn.set_default_tid(tid)
+		except Exception as e:
+			return False
 
 		# test if target is vulnerable
-		TRANS_PEEK_NMPIPE = 0x23
-		recvPkt = conn.send_trans(pack('<H', TRANS_PEEK_NMPIPE), maxParameterCount=0xffff, maxDataCount=0x800)
-		status = recvPkt.getNTStatus()
-		if status == 0xC0000205:  # STATUS_INSUFF_SERVER_RESOURCES
-			logger.green('[%s] VULNERABLE' % logger.GREEN(target))
-			vulnerable[target]=[]
-		else:
-			logger.red('[%s] PATCHED' % logger.RED(target))
+		try:
+			TRANS_PEEK_NMPIPE = 0x23
+			recvPkt = conn.send_trans(pack('<H', TRANS_PEEK_NMPIPE), maxParameterCount=0xffff, maxDataCount=0x800)
+			status = recvPkt.getNTStatus()
+			if status == 0xC0000205:  # STATUS_INSUFF_SERVER_RESOURCES
+				logger.green('[%s] VULNERABLE' % logger.GREEN(target))
+				vulnerable[target]=[]
+			else:
+				logger.red('[%s] PATCHED' % logger.RED(target))
+		except Exception as e:
+			return Falses
 
 		pipes_found = []
 
@@ -141,23 +145,30 @@ def worawit(target):
 							pipes_found.append(pipe_name)
 						except:
 							pass
-				dce.disconnect()
+				except Exception as e:
+					pass
+				finally:
+					dce.disconnect()
 				vulnerable[target]=pipes_found
 			except smb.SessionError as e:
 				continue
 			except smbconnection.SessionError as e:
 				continue
-
-		conn.disconnect_tree(tid)
-		conn.logoff()
-		conn.get_socket().close()
+			except Exception as e:
+				continue
+		try:
+			conn.disconnect_tree(tid)
+			conn.logoff()
+			conn.get_socket().close()
+		except Exception as e:
+			pass
 	except KeyboardInterrupt:
 		logger.red('Keyboard interrupt received..')
 		quit()
 
 def do_scan(targets):
 	for target in targets:
-		worawit(target)
+		run(target)
 
 banner.show('checker')
 t=args.targets
